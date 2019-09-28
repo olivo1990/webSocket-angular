@@ -1,25 +1,52 @@
 <div class="card mx-4 my-4">
   <div class="card-header">
     <ul class="nav nav-pills card-header-pills">
-      <li class="nav item mr-2">
-        <button class="btn btn-success" type="button">Conectar</button>
+      <li class="nav item mr-2" *ngIf="!conectado">
+        <input type="text" class="form-control" [(ngModel)]="mensaje.username" placeholder="Username..." name="username">
       </li>
-      <li class="nav item">
-        <button class="btn btn-warning" type="button">Cerrar Chat</button>
+      <li class="nav item mr-2" *ngIf="!conectado">
+        <button class="btn btn-success" type="button" (click) = "conectar()" [disabled] = "!mensaje.username">Conectar</button>
+      </li>
+      <li class="nav item" *ngIf="conectado">
+        <button class="btn btn-warning" type="button" (click) = "desconectar()">Cerrar Chat</button>
       </li>
     </ul>
   </div>
-  <div class="card-body" style="overflow-y: scroll; height: 360px;">
+  <div *ngIf="conectado">
+    <div #scrollChat [scrollTop]="scrollChat.scrollHeight" class="card-body" style="overflow-y: scroll; height: 360px;">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item list-group-item-light" *ngFor="let mensaje of mensajes">
+          <span *ngIf="mensaje.tipo=='NUEVO_USUARIO'">
+            {{ mensaje.fecha | date:'shortTime' }} @ {{ mensaje.texto }}
+            <span [ngStyle]="{'color': mensaje.color}"> {{ mensaje.username }} </span>
+          </span>
+          <!--<span *ngIf="mensaje.tipo=='MENSAJE'">
+            {{ mensaje.fecha | date:'shortTime' }}
+            <span [ngStyle]="{'color': mensaje.color}">
+              {{ mensaje.username }}
+            </span> dice:<br> {{ mensaje.texto }}
+          </span>-->
 
-  </div>
-  <div class="card-footer">
-    <form class="form-inline">
-      <div class="input-group mb-2 col-md-12">
-        <input type="text" class="form-control" placeholder="Escribe un mensaje..." name="texto">
-        <div class="input-group-append">
-          <button class="btn btn-outline-primary" type="submit">Enviar</button>
+          <div *ngIf="mensaje.tipo=='MENSAJE'" class="card mb-3" style="max-width: 18rem;" [ngStyle]="{'border-color': mensaje.color, color: mensaje.color}">
+            <div class="card-body">
+              <h5 class="card-title">{{ mensaje.username }} dice: </h5>
+              <p class="card-text">{{ mensaje.texto }}</p>
+            </div>
+          </div>
+
+        </li>
+      </ul>
+    </div>
+    <div class="card-footer">
+      <form class="form-inline">
+        <div class="input-group mb-2 col-md-12">
+          <input type="text" class="form-control" placeholder="Escribe un mensaje..." name="texto" [(ngModel)]="mensaje.texto" (keyup) = "escribiendoEvento()">
+          <div class="input-group-append">
+            <button class="btn btn-outline-primary" type="submit" (click)="enviarMensaje()">Enviar</button>
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
+      <div class="">{{ escribiendo }}</div>
+    </div>
   </div>
 </div>
